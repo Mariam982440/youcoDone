@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 1. On appelle les seeders dans l'ordre logique des dépendances
+        $this->call([
+            RoleSeeder::class,       // Doit être en premier (pour que les rôles existent)
+            UserSeeder::class,       // Crée les utilisateurs et leur assigne des rôles
+            RestaurantSeeder::class, // Crée restaurants, menus et plats
         ]);
+        
     }
 }
