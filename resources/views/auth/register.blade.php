@@ -28,6 +28,14 @@
                 <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
                 <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
+            <!-- Choix du Rôle -->
+            <div class="mt-4">
+                <x-label for="role" value="{{ __('Je m\'inscris en tant que...') }}" />
+                <select name="role" id="role" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                    <option value="client">{{ __('Client (Pour réserver et commander)') }}</option>
+                    <option value="restaurateur">{{ __('Restaurateur (Pour gérer mes restaurants)') }}</option>
+                </select>
+            </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
                 <div class="mt-4">

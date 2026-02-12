@@ -17,6 +17,12 @@ class RestaurantController extends Controller
     {
         $query = Restaurant::with(['photos', 'menus']);
 
+        // Si l'utilisateur est connecté, on charge ses favoris pour éviter le N+1
+        if (auth()->check()) {
+            $query->with(['favoritedBy' => function($q) {
+                $q->where('user_id', auth()->id());
+            }]);
+        }
         if ($request->filled('city')) {
             $query->where('city', 'LIKE', '%' . $request->city . '%');
         }
@@ -57,6 +63,7 @@ class RestaurantController extends Controller
             'opening_hours' => 'required|array', // On reçoit un tableau du formulaire
             'photos.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validation des images
         ]);
+    
 
         // 2. Création du restaurant (Mass Assignment)
         $restaurant = Restaurant::create([
@@ -139,7 +146,11 @@ class RestaurantController extends Controller
      */
     public function destroy(Restaurant $restaurant)
     {
-        //
+        Gate::authorize('delete', $restaurant);
+        $restaurant->delete();
+
+        return redirect()->route('restaurants.index')
+                        ->with('success', 'Le restaurant a été supprimé avec succès.');
     }
 
    

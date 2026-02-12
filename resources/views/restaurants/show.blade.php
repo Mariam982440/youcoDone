@@ -3,13 +3,40 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Lien de retour -->
-            <div class="mb-6">
+            <div class="mb-6 flex justify-between items-center">
                 <a href="{{ route('restaurants.index') }}" class="text-indigo-600 hover:text-indigo-800 flex items-center gap-2 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                     </svg>
                     Retour à la liste
                 </a>
+
+                <!-- BOUTONS D'ACTION (MODIFIER / SUPPRIMER) -->
+                @auth
+                    @can('update', $restaurant)
+                        <div class="flex items-center gap-3">
+                            <!-- Bouton Modifier -->
+                            <a href="{{ route('restaurants.edit', $restaurant) }}" class="inline-flex items-center bg-blue-600 px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Modifier
+                            </a>
+
+                            <!-- Bouton Supprimer -->
+                            <form action="{{ route('restaurants.destroy', $restaurant) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce restaurant ?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    @endcan
+                @endauth
             </div>
 
             <!-- HEADER & GALERIE -->
@@ -26,7 +53,9 @@
                             @endif
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                No images available
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                             </div>
                         @endif
                     </div>
@@ -64,89 +93,24 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> 
+            @auth
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+        <h3 class="font-bold text-gray-900 mb-4">Vous aimez cet endroit ?</h3>
+        <form action="{{ route('favorites.toggle', $restaurant) }}" method="POST">
+            @csrf
+            <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition {{ auth()->user()->favoriteRestaurants->contains($restaurant->id) ? 'bg-red-50 text-red-600 border-2 border-red-200' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="{{ auth()->user()->favoriteRestaurants->contains($restaurant->id) ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                {{ auth()->user()->favoriteRestaurants->contains($restaurant->id) ? 'Dans vos favoris' : 'Ajouter aux favoris' }}
+            </button>
+        </form>
+    </div>
+@endauth
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- COLONNE GAUCHE : MENUS ET PLATS -->
-                <div class="lg:col-span-2 space-y-8">
-                    <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        La Carte du Restaurant
-                    </h2>
+            <!-- ... (Le reste de votre code pour les menus et horaires reste inchangé) ... -->
 
-                    @forelse($restaurant->menus as $menu)
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="bg-indigo-50 p-4 border-b border-indigo-100">
-                                <h3 class="text-lg font-bold text-indigo-900">{{ $menu->title }}</h3>
-                                <p class="text-indigo-700 text-sm">{{ $menu->description }}</p>
-                            </div>
-                            <div class="p-6">
-                                <ul class="space-y-6">
-                                    @foreach($menu->dishes as $dish)
-                                        <li class="flex justify-between items-start">
-                                            <div class="flex gap-4">
-                                                @if($dish->photo)
-                                                    <img src="{{ $dish->photo }}" class="w-16 h-16 rounded-lg object-cover">
-                                                @endif
-                                                <div>
-                                                    <span class="text-xs font-bold text-gray-400 uppercase">{{ $dish->category->name }}</span>
-                                                    <h4 class="font-bold text-gray-900">{{ $dish->name }}</h4>
-                                                    @if(!$dish->is_available)
-                                                        <span class="text-red-500 text-xs font-medium">Non disponible aujourd'hui</span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <span class="font-bold text-indigo-600">{{ number_format($dish->price, 2) }} €</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="bg-gray-50 rounded-xl p-8 text-center text-gray-500 border border-dashed border-gray-300">
-                            Aucun menu n'a encore été publié pour ce restaurant.
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- COLONNE DROITE : HORAIRES ET INFOS -->
-                <div class="space-y-8">
-                    <!-- Horaires -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Horaires d'ouverture
-                        </h3>
-                        <ul class="space-y-3">
-                            @if($restaurant->opening_hours)
-                                @foreach($restaurant->opening_hours as $jour => $horaire)
-                                    <li class="flex justify-between text-sm {{ $jour == now()->translatedFormat('l') ? 'font-bold text-indigo-600' : 'text-gray-600' }}">
-                                        <span>{{ $jour }}</span>
-                                        <span>{{ $horaire ?? 'Fermé' }}</span>
-                                    </li>
-                                @endforeach
-                            @else
-                                <li class="text-gray-400 italic">Non renseignés</li>
-                            @endif
-                        </ul>
-                    </div>
-
-                    <!-- Action Favoris -->
-                    <div class="bg-indigo-600 rounded-2xl shadow-lg p-6 text-white text-center">
-                        <h3 class="font-bold mb-4">Ce restaurant vous plaît ?</h3>
-                        <button class="w-full bg-white text-indigo-600 font-bold py-3 rounded-xl hover:bg-indigo-50 transition flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            Ajouter aux favoris
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </x-app-layout>

@@ -12,9 +12,37 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <!-- LIENS PUBLICS -->
+                    <x-nav-link href="{{ route('restaurants.index') }}" :active="request()->routeIs('restaurants.index')">
+                        {{ __('Tous les Restaurants') }}
                     </x-nav-link>
+
+                    @auth
+                        <!-- LIENS CLIENT -->
+                        @role('client')
+                            <x-nav-link href="{{ route('favorites.index') }}" :active="request()->routeIs('favorites.index')">
+                                {{ __('Mes Favoris') }}
+                            </x-nav-link>
+                        @endrole
+
+                        <!-- LIENS RESTAURATEUR -->
+                        @role('restaurateur')
+                            <x-nav-link href="{{ route('restaurants.create') }}" :active="request()->routeIs('restaurants.create')">
+                                {{ __('Ajouter un Restaurant') }}
+                            </x-nav-link>
+                            <!-- Lien vers ses propres restos (on peut filtrer l'index) -->
+                            <x-nav-link href="{{ route('restaurants.index', ['my_restaurants' => 1]) }}">
+                                {{ __('Mes Établissements') }}
+                            </x-nav-link>
+                        @endrole
+
+                        <!-- LIENS ADMIN -->
+                        @role('admin')
+                            <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard')" class="text-red-600 font-bold">
+                                {{ __('Dashboard Admin') }}
+                            </x-nav-link>
+                        @endrole
+                    @endauth
                 </div>
             </div>
 

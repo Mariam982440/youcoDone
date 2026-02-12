@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\FavoriteController;
 
 
 Route::get('/', function () {
@@ -15,6 +16,8 @@ Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restau
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('restaurants', RestaurantController::class)->except(['index', 'show']);
     Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
+    Route::post('/restaurants/{restaurant}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/my-favorites', [FavoriteController::class, 'index'])->name('favorites.index');
 
     });
 

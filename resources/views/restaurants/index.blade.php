@@ -24,6 +24,9 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @role('restaurateur')
+                <a href="{{ route('restaurants.create') }}">Publier un restaurant</a>
+            @endrole
             
             <!-- FILTRES AVANCÉS -->
             <div class="bg-white p-6 rounded-xl shadow-sm mb-8 border border-gray-100">
@@ -85,11 +88,16 @@
                                 </div>
 
                                 <!-- Bouton Favoris -->
-                                <button class="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur rounded-full text-gray-400 hover:text-red-500 transition-colors shadow-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                </button>
+                                @auth
+                                    <form action="{{ route('favorites.toggle', $restaurant) }}" method="POST" class="absolute top-4 right-4">
+                                        @csrf
+                                        <button type="submit" class="p-2 bg-white/90 backdrop-blur rounded-full shadow-sm transition {{ auth()->user()->favoriteRestaurants->contains($restaurant->id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="{{ auth()->user()->favoriteRestaurants->contains($restaurant->id) ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endauth
                             </div>
 
                             <!-- Contenu de la Carte -->
