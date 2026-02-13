@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\RestaurantClosureController;
 use App\Http\Controllers\FavoriteController;
 
 
@@ -18,10 +19,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
     Route::post('/restaurants/{restaurant}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::get('/my-favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::get('/restaurants/{restaurant}/closures', [RestaurantClosureController::class, 'index'])->name('closures.index');
+    Route::post('/restaurants/{restaurant}/closures', [RestaurantClosureController::class, 'store'])->name('closures.store');
+    Route::delete('/closures/{closure}', [RestaurantClosureController::class, 'destroy'])->name('closures.destroy');    
+});
 
-    });
-
-Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show')->whereNumber('restaurant');;
+Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show')->whereNumber('restaurant');
 
 
 
