@@ -13,9 +13,28 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $user = auth()->user();
 
+        if ($user->hasRole('restaurateur')) {
+            $reservation = Reservation ::whereIn('restaurant_id', [$user->restaurant->id])
+            ->with(['restaurant.photos', 'user'])
+            ->latest()
+            ->paginate(10);
+
+            // Version "Pro" ultra-rapide sans charger les objets restaurants en mémoire
+            $reservations = Reservation::whereIn('restaurant_id', function($query) use ($user) {
+                $query->select('id')->from('restaurants')->where('user_id', $user->id);
+            })->with(['user', 'restaurant'])->latest()->paginate(10);
+            
+        } else {
+            
+            $reservations = Reservation::where("user_id", $user->id)
+            ->with('restaurant.photos')
+            ->latest()
+            ->get();
+        }
+        return view('reservations.index', compact('reservations'));
+    }
     /**
      * Show the form for creating a new resource.
      */
